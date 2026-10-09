@@ -14,7 +14,7 @@
   header{display:flex;align-items:center;gap:12px;background:var(--crg);color:#fff;padding:12px 16px;border-bottom:4px solid var(--accent)}
   header img{height:32px}
   header h1{margin:0;font-size:18px;font-weight:700}
-  .wrap{max-width:860px;margin:20px auto;padding:0 16px 48px}
+  .wrap{max-width:900px;margin:20px auto;padding:0 16px 48px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
   h2{margin:0 0 4px;font-size:24px}
   h3{margin:0 0 10px;font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
@@ -33,7 +33,7 @@
   .ganadores .n{display:inline-block;min-width:1.6em;color:var(--muted);font-weight:600;font-size:.7em}
   @keyframes aparece{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.ganadores li{animation:none}}
-  .btn{background:var(--crg);color:#fff;border:0;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px}
+  .btn{background:var(--crg);color:#fff;border:0;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;text-decoration:none;display:inline-block}
   .btn-sec{background:#fff;color:var(--crg);border:1px solid var(--crg)}
   .acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;word-break:break-all}
@@ -45,8 +45,24 @@
   .punto{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:8px;animation:late 1s ease-in-out infinite}
   @keyframes late{50%{opacity:.25}}
   a{color:var(--crg-2)}
+  .pie{text-align:center;font-size:13px}
+
+  /* Formulario de creación */
+  .paso{display:inline-block;background:var(--crg);color:#fff;border-radius:50%;width:26px;height:26px;line-height:26px;text-align:center;font-size:14px;margin-right:8px}
+  .tit{margin:0 0 12px;font-size:17px;font-weight:700}
+  label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+  input,textarea{font:inherit;border:1px solid var(--border);border-radius:10px;padding:9px 11px;width:100%;background:#fff;color:var(--ink)}
+  textarea{min-height:230px;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
+  .fila{display:grid;grid-template-columns:2fr 1.4fr .7fr .7fr;gap:12px}
+  .dos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:760px){.fila,.dos{grid-template-columns:1fr}}
+  .error{color:var(--warn);font-weight:600;margin-top:10px;white-space:pre-line}
+  .nota{background:#fffbea;border:1px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:16px}
+  .caja{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px;margin:6px 0 10px}
+  #enlace{font:12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:70px}
+
   @media print{
-    body{background:#fff} .acciones,.no-print{display:none !important}
+    body{background:#fff} .acciones,.pie{display:none !important}
     .card{border:0;padding:8px 0} details{display:block} details>*{display:block !important}
     header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
@@ -60,13 +76,69 @@
 
 <main class="wrap">
 
-  <section id="s-cargando" class="card centro muted">Cargando sorteo…</section>
+  <!-- ============ MODO CREAR (la página se abre sin sorteo en el enlace) ============ -->
+  <div id="modo-crear" class="hidden">
+    <div class="nota">
+      Lo que escribas aquí no se guarda ni se envía a ningún sitio: el sorteo queda contenido en el enlace que se genera al final.
+      Los nombres completos <strong>no</strong> entran en el enlace; solo la versión abreviada de la derecha.
+    </div>
+    <div id="avisoLocal" class="card aviso hidden">
+      Estás abriendo este archivo desde tu ordenador. El enlace que generes solo funcionará en este equipo.
+      Para enviarlo a los participantes, genera el sorteo desde la página publicada en GitHub.
+    </div>
 
-  <section id="s-vacio" class="card centro hidden">
-    <h2>No hay ningún sorteo publicado</h2>
-    <p class="muted">Cuando se publique uno, aparecerá aquí con su cuenta atrás.</p>
-  </section>
+    <section class="card">
+      <p class="tit"><span class="paso">1</span>Datos del sorteo</p>
+      <div class="fila">
+        <div><label for="fTitulo">Título</label><input id="fTitulo" type="text" value="Sorteo interno CRG" maxlength="120"></div>
+        <div><label for="fFecha">Fecha y hora del sorteo</label><input id="fFecha" type="datetime-local"></div>
+        <div><label for="fGan">Ganadores</label><input id="fGan" type="number" min="1" value="1"></div>
+        <div><label for="fSup">Suplentes</label><input id="fSup" type="number" min="0" value="0"></div>
+      </div>
+      <p class="muted" style="margin:8px 0 0">La hora es la de este ordenador. Deja unos minutos de margen para enviar el enlace.</p>
+    </section>
 
+    <section class="card">
+      <p class="tit"><span class="paso">2</span>Participantes</p>
+      <div class="dos">
+        <div>
+          <label for="fCompletos">Nombres completos (uno por línea)</label>
+          <textarea id="fCompletos" placeholder="Ana García López
+María del Carmen Pérez Souto
+Vázquez Rey, Xoán"></textarea>
+          <p class="muted">Se admite «Nombre Apellido1 Apellido2» o «Apellidos, Nombre».</p>
+        </div>
+        <div>
+          <label for="fPublicos">Así aparecerán en la web <span id="fCuenta" class="muted"></span></label>
+          <textarea id="fPublicos" placeholder="Ana G. L.
+María del Carmen P. S.
+Xoán V. R."></textarea>
+          <p class="muted">Puedes corregir esta lista a mano. Si cambias la de la izquierda, se vuelve a generar.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="tit"><span class="paso">3</span>Crear el enlace</p>
+      <button id="btnCrear" class="btn" style="font-size:15px;padding:11px 18px">Crear enlace del sorteo</button>
+      <div id="fError" class="error hidden"></div>
+      <div id="fSalida" class="hidden" style="margin-top:16px">
+        <label for="enlace">Enlace para enviar a los participantes</label>
+        <textarea id="enlace" readonly></textarea>
+        <div class="acciones" style="margin-top:8px">
+          <button id="btnCopiarEnlace" class="btn">Copiar enlace</button>
+          <a id="btnAbrir" class="btn btn-sec" target="_blank" rel="noopener">Abrir el sorteo</a>
+        </div>
+        <p id="fLargo" class="muted hidden">El enlace es largo. Antes de enviarlo a todos, envíatelo a ti y comprueba que se abre completo.</p>
+        <p style="margin:16px 0 0"><strong>Huella del sorteo</strong></p>
+        <div class="caja mono" id="fHuella"></div>
+        <p class="muted">Incluye la huella en el mensaje junto al enlace. La misma huella aparece en la página del sorteo:
+          así cualquiera puede comprobar que el enlace que abre es el que enviaste.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ MODO VER (el enlace contiene un sorteo) ============ -->
   <section id="s-error" class="card aviso hidden"></section>
 
   <section id="s-cabecera" class="card hidden">
@@ -109,13 +181,14 @@
   </section>
 
   <section id="s-verif" class="card hidden">
-    <details>
+    <details id="detVerif">
       <summary>Cómo se garantiza que el sorteo es limpio</summary>
       <p class="muted">
         El sorteo no lo decide esta página ni quien lo organiza. Los ganadores se calculan a partir de un número aleatorio
         público que emite la red <a href="https://drand.love" target="_blank" rel="noopener">drand</a> justo a la hora del sorteo
         y que nadie puede conocer antes. Con ese número y la lista de participantes, cualquier navegador obtiene exactamente
-        el mismo resultado. La huella identifica la lista y las condiciones: si alguien las cambiara, la huella sería distinta.
+        el mismo resultado. La huella identifica la lista y las condiciones: si alguien las cambiara, la huella sería distinta
+        de la que se envió con el enlace.
       </p>
       <dl>
         <dt>Huella del sorteo</dt><dd class="mono" id="vHuella">—</dd>
@@ -126,13 +199,14 @@
     </details>
   </section>
 
+  <p id="pie" class="pie muted hidden"><a id="lnkNuevo" href="#">Preparar otro sorteo</a></p>
 </main>
 
 <script>
 (function(){
 "use strict";
 
-/* ===================== LÓGICA (idéntica en admin.html) ===================== */
+/* ===================== LÓGICA DEL SORTEO ===================== */
 //<logica>
 const CADENA = {
   hash: "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971", // drand "quicknet"
@@ -145,7 +219,7 @@ async function sha256Hex(txt){ return aHex(await crypto.subtle.digest("SHA-256",
 // Primera ronda emitida a la hora del sorteo o justo después
 function rondaPara(ms){ return Math.ceil((ms/1000 - CADENA.genesis)/CADENA.periodo) + 1; }
 function canonico(c){
-  return JSON.stringify([c.version, c.titulo, c.fechaSorteo, c.ganadores, c.suplentes, c.drand.cadena, c.drand.ronda, c.participantes]);
+  return JSON.stringify([1, c.titulo, c.fechaSorteo, c.ganadores, c.suplentes, CADENA.hash, c.ronda, c.participantes]);
 }
 // Barajado Fisher-Yates determinista. Los números salen de SHA-256(semilla:contador), sin sesgo (muestreo por rechazo).
 async function barajar(lista, semillaHex){
@@ -164,16 +238,118 @@ async function barajar(lista, semillaHex){
   for(let i=arr.length-1;i>0;i--){ const j = await menorQue(i+1); [arr[i],arr[j]] = [arr[j],arr[i]]; }
   return arr;
 }
+
+/* ----- El sorteo viaja en el enlace: JSON comprimido y en base64 apto para URL ----- */
+function b64u(bytes){ let s=""; for(let i=0;i<bytes.length;i+=8192) s+=String.fromCharCode.apply(null, bytes.subarray(i,i+8192));
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function deB64u(txt){ const s=atob(txt.replace(/-/g,"+").replace(/_/g,"/")); const a=new Uint8Array(s.length); for(let i=0;i<s.length;i++) a[i]=s.charCodeAt(i); return a; }
+async function pasar(bytes, flujo){ return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(flujo)).arrayBuffer()); }
+async function codificar(c){
+  const bytes = new TextEncoder().encode(JSON.stringify({t:c.titulo, f:c.fechaSorteo, g:c.ganadores, s:c.suplentes, p:c.participantes}));
+  if(typeof CompressionStream === "function") return "1" + b64u(await pasar(bytes, new CompressionStream("deflate-raw")));
+  return "0" + b64u(bytes);
+}
+async function decodificar(txt){
+  let bytes = deB64u(txt.slice(1));
+  if(txt[0]==="1"){
+    if(typeof DecompressionStream !== "function") throw new Error("navegador");
+    bytes = await pasar(bytes, new DecompressionStream("deflate-raw"));
+  }else if(txt[0]!=="0") throw new Error("formato");
+  const o = JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(bytes));
+  return {titulo:o.t, fechaSorteo:o.f, ganadores:o.g, suplentes:o.s, participantes:o.p};
+}
 //</logica>
-/* ========================================================================== */
+
+//<abreviar>
+const PARTICULAS = new Set(["de","del","la","las","los","y","e","i","da","do","das","dos","san","santa"]);
+const esParticula = w => PARTICULAS.has(w.toLowerCase());
+// "Ana García López" -> "Ana G. L."   "García López, Ana" -> "Ana G. L."
+function abreviar(linea){
+  const s = linea.trim().replace(/\s+/g," ");
+  if(!s) return "";
+  let nombre, apellidos;
+  if(s.includes(",")){
+    const i = s.indexOf(",");
+    apellidos = s.slice(0,i).trim().split(" ").filter(Boolean);
+    nombre = s.slice(i+1).trim();
+    if(!nombre) return s.slice(0,i).trim();
+  }else{
+    const t = s.split(" ");
+    const sig = []; t.forEach((w,i)=>{ if(!esParticula(w)) sig.push(i); });
+    if(sig.length < 2) return s;
+    // Con tres o más palabras se toman dos apellidos; con dos, uno
+    let corte = sig[sig.length - (sig.length>=3 ? 2 : 1)];
+    while(corte-1 > 0 && esParticula(t[corte-1])) corte--;   // "de la Fuente" va con el apellido
+    nombre = t.slice(0,corte).join(" ");
+    apellidos = t.slice(corte);
+  }
+  const iniciales = apellidos.filter(w=>!esParticula(w)).map(w=>Array.from(w)[0].toUpperCase()+".").join(" ");
+  return (nombre+" "+iniciales).trim();
+}
+//</abreviar>
+/* ============================================================= */
 
 const SERVIDORES = ["https://api.drand.sh","https://api2.drand.sh","https://api3.drand.sh","https://drand.cloudflare.com"];
 const $ = id => document.getElementById(id);
 const ver = (id,si) => $(id).classList.toggle("hidden", !si);
 const fFecha = d => new Date(d).toLocaleString("es-ES",{dateStyle:"full",timeStyle:"short"});
 const fFechaSeg = d => new Date(d).toLocaleString("es-ES",{dateStyle:"short",timeStyle:"medium"});
+const lineas = t => t.split(/\r?\n/).map(x=>x.trim().replace(/\s+/g," ")).filter(Boolean);
+const base = () => location.href.split("#")[0];
 
-let cfg=null, objetivo=0, reloj=null, sorteando=false, resultado=null;
+/* =========================== MODO CREAR =========================== */
+function modoCrear(){
+  ver("modo-crear",true);
+  ver("avisoLocal", location.protocol==="file:");
+  const d = new Date(Date.now()+30*60*1000); d.setSeconds(0,0);
+  const p=n=>String(n).padStart(2,"0");
+  $("fFecha").value = d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes());
+}
+function contar(){ const n=lineas($("fPublicos").value).length; $("fCuenta").textContent = n ? "("+n+")" : ""; }
+function ocultar(){ ver("fSalida",false); ver("fError",false); }
+function fallo(msg){ $("fError").textContent=msg; ver("fError",true); ver("fSalida",false); }
+
+$("fCompletos").addEventListener("input", ()=>{ $("fPublicos").value = lineas($("fCompletos").value).map(abreviar).join("\n"); contar(); ocultar(); });
+$("fPublicos").addEventListener("input", ()=>{ contar(); ocultar(); });
+["fTitulo","fFecha","fGan","fSup"].forEach(id=>$(id).addEventListener("input", ocultar));
+
+$("btnCrear").addEventListener("click", async ()=>{
+  const titulo = $("fTitulo").value.trim();
+  const participantes = lineas($("fPublicos").value);
+  const nGan = Number($("fGan").value), nSup = Number($("fSup").value);
+  const ms = new Date($("fFecha").value).getTime();
+
+  if(!titulo) return fallo("Escribe un título.");
+  if(isNaN(ms)) return fallo("Indica la fecha y la hora del sorteo.");
+  if(ms < Date.now()+2*60*1000) return fallo("La hora del sorteo tiene que ser futura (al menos dentro de 2 minutos).");
+  if(!Number.isInteger(nGan) || nGan<1) return fallo("Debe haber al menos 1 ganador.");
+  if(!Number.isInteger(nSup) || nSup<0) return fallo("El número de suplentes no es válido.");
+  if(participantes.length<2) return fallo("Introduce al menos 2 participantes.");
+  if(nGan+nSup > participantes.length) return fallo("Ganadores + suplentes no puede superar el número de participantes.");
+
+  const vistos = new Set(), repetidos = new Set();
+  participantes.forEach(p=>{ const k=p.toLocaleLowerCase("es"); if(vistos.has(k)) repetidos.add(p); vistos.add(k); });
+  if(repetidos.size) return fallo("Hay participantes que aparecen igual en la web:\n• "+[...repetidos].join("\n• ")
+    +"\n\nSi es la misma persona repetida, bórrala. Si son personas distintas, añade algo que las distinga en la lista de la derecha (por ejemplo, la oficina).");
+
+  const c = {titulo, fechaSorteo:new Date(ms).toISOString(), ganadores:nGan, suplentes:nSup, participantes, ronda:rondaPara(ms)};
+  const url = base() + "#" + await codificar(c);
+  $("enlace").value = url;
+  $("btnAbrir").href = url;
+  $("fHuella").textContent = await sha256Hex(canonico(c));
+  ver("fLargo", url.length > 2000);
+  ver("fError",false); ver("fSalida",true);
+});
+
+$("btnCopiarEnlace").addEventListener("click", async ()=>{
+  const b=$("btnCopiarEnlace");
+  try{ await navigator.clipboard.writeText($("enlace").value); }
+  catch(e){ $("enlace").select(); try{ document.execCommand("copy"); }catch(_){} }
+  b.textContent="Copiado"; setTimeout(()=>{ b.textContent="Copiar enlace"; },1500);
+});
+
+/* ============================ MODO VER ============================ */
+let cfg=null, objetivo=0, reloj=null, resultado=null;
 
 function pintarLista(ul, arr, numerar){
   ul.textContent="";
@@ -183,30 +359,26 @@ function pintarLista(ul, arr, numerar){
     li.appendChild(document.createTextNode(x)); ul.appendChild(li);
   });
 }
-function error(msg){
-  ["s-cargando","s-cuenta","s-espera","s-resultado"].forEach(id=>ver(id,false));
-  $("s-error").textContent = msg; ver("s-error",true);
-  if(reloj){ clearInterval(reloj); reloj=null; }
-}
+function error(msg){ $("s-error").textContent = msg; ver("s-error",true); ver("pie",true); }
 
-async function iniciar(){
-  let r;
-  try{ r = await fetch("sorteo.json?t="+Date.now(), {cache:"no-store"}); }
-  catch(e){ ver("s-cargando",false); ver("s-vacio",true); return; }
-  if(!r.ok){ ver("s-cargando",false); ver("s-vacio",true); return; }
-  try{ cfg = await r.json(); }catch(e){ return error("El archivo sorteo.json no se puede leer. Vuelve a generarlo con la página de administración."); }
+async function modoVer(codigo){
+  ver("pie",true);
+  try{ cfg = await decodificar(codigo); }
+  catch(e){
+    return error(e.message==="navegador"
+      ? "Este navegador es demasiado antiguo para abrir el sorteo. Ábrelo con una versión actual de Chrome, Edge, Firefox o Safari."
+      : "El enlace está incompleto o dañado. Cópialo entero desde el mensaje original y vuelve a abrirlo.");
+  }
+  // Nada de lo que llega en el enlace se da por bueno sin comprobar
+  const ok = cfg && typeof cfg.titulo==="string" && typeof cfg.fechaSorteo==="string" && !isNaN(Date.parse(cfg.fechaSorteo))
+    && Array.isArray(cfg.participantes) && cfg.participantes.length>=2 && cfg.participantes.every(p=>typeof p==="string" && p)
+    && Number.isInteger(cfg.ganadores) && cfg.ganadores>=1 && Number.isInteger(cfg.suplentes) && cfg.suplentes>=0
+    && cfg.ganadores+cfg.suplentes<=cfg.participantes.length;
+  if(!ok) return error("El enlace está incompleto o dañado. Cópialo entero desde el mensaje original y vuelve a abrirlo.");
 
-  // Validaciones: nada de lo que hay en el archivo se da por bueno sin comprobar
-  const ok = cfg && typeof cfg.titulo==="string" && Array.isArray(cfg.participantes) && cfg.participantes.length>=2
-    && cfg.participantes.every(p=>typeof p==="string") && Number.isInteger(cfg.ganadores) && cfg.ganadores>=1
-    && Number.isInteger(cfg.suplentes) && cfg.suplentes>=0 && cfg.ganadores+cfg.suplentes<=cfg.participantes.length
-    && cfg.drand && !isNaN(Date.parse(cfg.fechaSorteo));
-  if(!ok) return error("El archivo sorteo.json está incompleto. Vuelve a generarlo con la página de administración.");
   objetivo = Date.parse(cfg.fechaSorteo);
-  if(cfg.drand.cadena!==CADENA.hash || cfg.drand.ronda!==rondaPara(objetivo))
-    return error("Sorteo no válido: la ronda de aleatoriedad no corresponde a la fecha indicada.");
-  if(await sha256Hex(canonico(cfg)) !== cfg.huella)
-    return error("Sorteo no válido: la huella no coincide con los datos publicados. La lista o las condiciones se han modificado.");
+  cfg.ronda = rondaPara(objetivo);
+  cfg.huella = await sha256Hex(canonico(cfg));
 
   document.title = cfg.titulo + " · Sorteo CRG";
   $("titulo").textContent = cfg.titulo;
@@ -217,13 +389,12 @@ async function iniciar(){
   $("hPart").textContent = "Participantes (" + cfg.participantes.length + ")";
   pintarLista($("ulPart"), cfg.participantes.slice().sort((a,b)=>a.localeCompare(b,"es")));
   $("vHuella").textContent = cfg.huella;
-  $("vRonda").textContent = cfg.drand.ronda + " (red quicknet)";
-  const url = SERVIDORES[0]+"/"+CADENA.hash+"/public/"+cfg.drand.ronda;
-  const a=document.createElement("a"); a.href=url; a.target="_blank"; a.rel="noopener"; a.textContent="Ver el número en drand";
+  $("vRonda").textContent = cfg.ronda + " (red quicknet)";
+  const a=document.createElement("a"); a.href=SERVIDORES[0]+"/"+CADENA.hash+"/public/"+cfg.ronda; a.target="_blank"; a.rel="noopener"; a.textContent="Ver el número en drand";
   $("vUrl").textContent=""; $("vUrl").appendChild(a);
 
-  ver("s-cargando",false); ver("s-cabecera",true); ver("s-participantes",true); ver("s-verif",true);
-  tic(); reloj = setInterval(tic, 250);
+  ver("s-cabecera",true); ver("s-participantes",true); ver("s-verif",true);
+  tic(); if(!resultado && objetivo > Date.now()) reloj = setInterval(tic, 250);
 }
 
 function tic(){
@@ -237,20 +408,20 @@ function tic(){
     ver("s-cuenta",true);
     return;
   }
-  clearInterval(reloj); reloj=null;
+  if(reloj){ clearInterval(reloj); reloj=null; }
   ver("s-cuenta",false);
-  if(!sorteando) sortear();
+  sortear();
 }
 
 async function pedirAzar(){
   for(let intento=0;;intento++){
-    for(const base of SERVIDORES){
+    for(const srv of SERVIDORES){
       try{
-        const r = await fetch(base+"/"+CADENA.hash+"/public/"+cfg.drand.ronda, {cache:"no-store"});
+        const r = await fetch(srv+"/"+CADENA.hash+"/public/"+cfg.ronda, {cache:"no-store"});
         if(!r.ok) continue;
         const d = await r.json();
         // Comprobación de coherencia: en quicknet, el número aleatorio es SHA-256 de la firma
-        if(d.round===cfg.drand.ronda && /^[0-9a-f]{64}$/.test(d.randomness) && /^[0-9a-f]+$/.test(d.signature||"")
+        if(d.round===cfg.ronda && /^[0-9a-f]{64}$/.test(d.randomness) && /^[0-9a-f]+$/.test(d.signature||"")
            && aHex(await crypto.subtle.digest("SHA-256", hexABytes(d.signature)))===d.randomness) return d.randomness;
       }catch(e){ /* probar el siguiente servidor */ }
     }
@@ -261,7 +432,7 @@ async function pedirAzar(){
 }
 
 async function sortear(){
-  sorteando=true; ver("s-espera",true);
+  ver("s-espera",true);
   const azar = await pedirAzar();
   const semilla = await sha256Hex(azar + "|" + cfg.huella);
   const orden = await barajar(cfg.participantes, semilla);
@@ -278,11 +449,10 @@ async function sortear(){
 }
 
 function acta(){
-  const horaRonda = (CADENA.genesis + (cfg.drand.ronda-1)*CADENA.periodo)*1000;
+  const horaRonda = (CADENA.genesis + (cfg.ronda-1)*CADENA.periodo)*1000;
   return [
     "ACTA DE SORTEO – " + cfg.titulo,
     "=".repeat(60),
-    "Sorteo publicado:    " + (cfg.creado ? fFechaSeg(cfg.creado) : "—"),
     "Fecha del sorteo:    " + fFechaSeg(objetivo),
     "Ganadores:           " + cfg.ganadores,
     "Suplentes:           " + cfg.suplentes,
@@ -299,13 +469,16 @@ function acta(){
     "VERIFICACIÓN",
     "-".repeat(60),
     "Huella SHA-256 del sorteo: " + cfg.huella,
-    "Aleatoriedad pública: drand quicknet, ronda " + cfg.drand.ronda + " (emitida el " + fFechaSeg(horaRonda) + ")",
+    "Aleatoriedad pública: drand quicknet, ronda " + cfg.ronda + " (emitida el " + fFechaSeg(horaRonda) + ")",
     "Número aleatorio: " + resultado.azar,
-    "Consulta: " + SERVIDORES[0] + "/" + CADENA.hash + "/public/" + cfg.drand.ronda,
+    "Consulta: " + SERVIDORES[0] + "/" + CADENA.hash + "/public/" + cfg.ronda,
     "Semilla = SHA-256(número aleatorio + \"|\" + huella): " + resultado.semilla,
     "Método: barajado Fisher-Yates de la lista publicada, con números obtenidos de",
     "SHA-256(semilla + \":\" + contador). Los primeros puestos son los ganadores y los",
-    "siguientes los suplentes. Cualquiera puede repetir el cálculo y obtener el mismo resultado."
+    "siguientes los suplentes. Cualquiera puede repetir el cálculo y obtener el mismo resultado.",
+    "",
+    "Enlace del sorteo:",
+    location.href
   ].join("\n");
 }
 
@@ -314,9 +487,13 @@ $("btnTXT").addEventListener("click", ()=>{
   const url = URL.createObjectURL(new Blob([acta()],{type:"text/plain;charset=utf-8"}));
   const a=document.createElement("a"); a.href=url; a.download="Acta_sorteo.txt"; a.click(); URL.revokeObjectURL(url);
 });
-$("btnPrint").addEventListener("click", ()=>{ document.querySelector("details").open=true; window.print(); });
+$("btnPrint").addEventListener("click", ()=>{ $("detVerif").open=true; window.print(); });
 
-iniciar();
+/* ============================ ARRANQUE ============================ */
+$("lnkNuevo").href = base();
+window.addEventListener("hashchange", ()=>location.reload());
+const codigo = location.hash.slice(1);
+if(codigo) modoVer(codigo); else modoCrear();
 })();
 </script>
 </body>
