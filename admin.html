@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preparar sorteo · CRG</title>
+<style>
+  :root{ --crg:#1b4332; --accent:#ffd43b; --bg:#f4f6f5; --ink:#1f2937; --muted:#6b7280; --border:#e5e7eb; --warn:#b42318; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  header{background:var(--crg);color:#fff;padding:12px 16px;border-bottom:4px solid var(--accent)}
+  header h1{margin:0;font-size:18px}
+  .wrap{max-width:980px;margin:20px auto;padding:0 16px 48px}
+  .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+  h2{margin:0 0 12px;font-size:17px}
+  h2 .paso{display:inline-block;background:var(--crg);color:#fff;border-radius:50%;width:26px;height:26px;line-height:26px;text-align:center;font-size:14px;margin-right:8px}
+  .muted{color:var(--muted);font-size:13.5px}
+  label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+  input,textarea{font:inherit;border:1px solid var(--border);border-radius:10px;padding:9px 11px;width:100%}
+  textarea{min-height:240px;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
+  .fila{display:grid;grid-template-columns:2fr 1.4fr .7fr .7fr;gap:12px}
+  .dos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:760px){.fila,.dos{grid-template-columns:1fr}}
+  .btn{background:var(--crg);color:#fff;border:0;padding:11px 18px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px}
+  .btn-sec{background:#fff;color:var(--crg);border:1px solid var(--crg);padding:6px 12px;font-size:13px}
+  .error{color:var(--warn);font-weight:600;margin-top:10px;white-space:pre-line}
+  .hidden{display:none !important}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;word-break:break-all;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px;margin:8px 0}
+  .privado{background:#fffbea;border:1px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:14px}
+  ol{margin:8px 0 0 20px;padding:0} ol li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<header><h1>Preparar sorteo · CRG</h1></header>
+<main class="wrap">
+
+  <div class="privado">
+    Esta página funciona solo en tu ordenador: nada de lo que escribas aquí se envía a ningún sitio.
+    Los nombres completos <strong>no</strong> se guardan en el archivo que vas a publicar; solo la versión abreviada de la derecha.
+  </div>
+
+  <section class="card">
+    <h2><span class="paso">1</span>Datos del sorteo</h2>
+    <div class="fila">
+      <div><label for="titulo">Título</label><input id="titulo" type="text" value="Sorteo interno CRG"></div>
+      <div><label for="fecha">Fecha y hora del sorteo</label><input id="fecha" type="datetime-local"></div>
+      <div><label for="nGan">Ganadores</label><input id="nGan" type="number" min="1" value="1"></div>
+      <div><label for="nSup">Suplentes</label><input id="nSup" type="number" min="0" value="0"></div>
+    </div>
+    <p class="muted" style="margin:8px 0 0">La hora es la de este ordenador. Deja margen suficiente para subir el archivo y enviar el enlace.</p>
+  </section>
+
+  <section class="card">
+    <h2><span class="paso">2</span>Participantes</h2>
+    <div class="dos">
+      <div>
+        <label for="completos">Nombres completos (uno por línea)</label>
+        <textarea id="completos" placeholder="Ana García López
+María del Carmen Pérez Souto
+Vázquez Rey, Xoán"></textarea>
+        <p class="muted">Se admite «Nombre Apellido1 Apellido2» o «Apellidos, Nombre».</p>
+      </div>
+      <div>
+        <label for="publicos">Así aparecerán en la web <span id="cuenta" class="muted"></span></label>
+        <textarea id="publicos" placeholder="Ana G. L.
+María del Carmen P. S.
+Xoán V. R."></textarea>
+        <p class="muted">Puedes corregir esta lista a mano. Si cambias la de la izquierda, se vuelve a generar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="paso">3</span>Generar el archivo</h2>
+    <button id="btnGenerar" class="btn">Generar sorteo.json</button>
+    <div id="error" class="error hidden"></div>
+    <div id="salida" class="hidden" style="margin-top:16px">
+      <p><strong>Archivo descargado.</strong> Huella del sorteo:</p>
+      <div class="mono" id="huella"></div>
+      <button id="btnCopiar" class="btn btn-sec">Copiar huella</button>
+      <ol>
+        <li>Sube <code>sorteo.json</code> a tu repositorio de GitHub, sustituyendo el anterior si lo hay.</li>
+        <li>Abre el enlace de la web y comprueba que aparece la cuenta atrás (puede tardar un minuto).</li>
+        <li>Envía el enlace a los participantes e incluye la huella en el mensaje: así queda constancia de que la lista no se cambia después.</li>
+      </ol>
+      <p class="muted">Si modificas cualquier dato, tienes que generar el archivo de nuevo: la huella cambia.</p>
+    </div>
+  </section>
+
+</main>
+<script>
+(function(){
+"use strict";
+
+/* ===================== LÓGICA (idéntica en index.html) ===================== */
+//<logica>
+const CADENA = {
+  hash: "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971", // drand "quicknet"
+  genesis: 1692803367, // segundos Unix de la ronda 1
+  periodo: 3           // segundos entre rondas
+};
+function aHex(buf){ return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join(""); }
+async function sha256Hex(txt){ return aHex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt))); }
+// Primera ronda emitida a la hora del sorteo o justo después
+function rondaPara(ms){ return Math.ceil((ms/1000 - CADENA.genesis)/CADENA.periodo) + 1; }
+function canonico(c){
+  return JSON.stringify([c.version, c.titulo, c.fechaSorteo, c.ganadores, c.suplentes, c.drand.cadena, c.drand.ronda, c.participantes]);
+}
+//</logica>
+
+//<abreviar>
+const PARTICULAS = new Set(["de","del","la","las","los","y","e","i","da","do","das","dos","san","santa"]);
+const esParticula = w => PARTICULAS.has(w.toLowerCase());
+// "Ana García López" -> "Ana G. L."   "García López, Ana" -> "Ana G. L."
+function abreviar(linea){
+  const s = linea.trim().replace(/\s+/g," ");
+  if(!s) return "";
+  let nombre, apellidos;
+  if(s.includes(",")){
+    const i = s.indexOf(",");
+    apellidos = s.slice(0,i).trim().split(" ").filter(Boolean);
+    nombre = s.slice(i+1).trim();
+    if(!nombre) return s.slice(0,i).trim();
+  }else{
+    const t = s.split(" ");
+    const sig = []; t.forEach((w,i)=>{ if(!esParticula(w)) sig.push(i); });
+    if(sig.length < 2) return s;
+    // Con tres o más palabras se toman dos apellidos; con dos, uno
+    let corte = sig[sig.length - (sig.length>=3 ? 2 : 1)];
+    while(corte-1 > 0 && esParticula(t[corte-1])) corte--;   // "de la Fuente" va con el apellido
+    nombre = t.slice(0,corte).join(" ");
+    apellidos = t.slice(corte);
+  }
+  const iniciales = apellidos.filter(w=>!esParticula(w)).map(w=>Array.from(w)[0].toUpperCase()+".").join(" ");
+  return (nombre+" "+iniciales).trim();
+}
+//</abreviar>
+/* ========================================================================== */
+
+const $ = id => document.getElementById(id);
+const lineas = t => t.split(/\r?\n/).map(x=>x.trim().replace(/\s+/g," ")).filter(Boolean);
+
+// Fecha por defecto: dentro de una hora, en punto de minuto
+(function(){
+  const d = new Date(Date.now()+60*60*1000); d.setSeconds(0,0);
+  const p=n=>String(n).padStart(2,"0");
+  $("fecha").value = d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes());
+})();
+
+function contar(){ const n=lineas($("publicos").value).length; $("cuenta").textContent = n ? "("+n+")" : ""; }
+$("completos").addEventListener("input", ()=>{
+  $("publicos").value = lineas($("completos").value).map(abreviar).join("\n"); contar(); ocultar();
+});
+$("publicos").addEventListener("input", ()=>{ contar(); ocultar(); });
+["titulo","fecha","nGan","nSup"].forEach(id=>$(id).addEventListener("input", ocultar));
+function ocultar(){ $("salida").classList.add("hidden"); $("error").classList.add("hidden"); }
+function fallo(msg){ $("error").textContent=msg; $("error").classList.remove("hidden"); $("salida").classList.add("hidden"); }
+
+$("btnGenerar").addEventListener("click", async ()=>{
+  const titulo = $("titulo").value.trim();
+  const participantes = lineas($("publicos").value);
+  const nGan = Number($("nGan").value), nSup = Number($("nSup").value);
+  const ms = new Date($("fecha").value).getTime();
+
+  if(!titulo) return fallo("Escribe un título.");
+  if(isNaN(ms)) return fallo("Indica la fecha y la hora del sorteo.");
+  if(ms < Date.now()+2*60*1000) return fallo("La hora del sorteo tiene que ser futura (al menos dentro de 2 minutos).");
+  if(!Number.isInteger(nGan) || nGan<1) return fallo("Debe haber al menos 1 ganador.");
+  if(!Number.isInteger(nSup) || nSup<0) return fallo("El número de suplentes no es válido.");
+  if(participantes.length<2) return fallo("Introduce al menos 2 participantes.");
+  if(nGan+nSup > participantes.length) return fallo("Ganadores + suplentes no puede superar el número de participantes.");
+
+  const vistos = new Map(), repetidos = new Set();
+  participantes.forEach(p=>{ const k=p.toLocaleLowerCase("es"); if(vistos.has(k)) repetidos.add(p); vistos.set(k,true); });
+  if(repetidos.size) return fallo("Hay participantes que aparecen igual en la web:\n• "+[...repetidos].join("\n• ")
+    +"\n\nSi es la misma persona repetida, bórrala. Si son personas distintas, añade algo que las distinga en la lista de la derecha (por ejemplo, la oficina).");
+
+  const cfg = {
+    version: 1,
+    titulo,
+    fechaSorteo: new Date(ms).toISOString(),
+    ganadores: nGan,
+    suplentes: nSup,
+    participantes,
+    drand: { cadena: CADENA.hash, ronda: rondaPara(ms) },
+    creado: new Date().toISOString()
+  };
+  cfg.huella = await sha256Hex(canonico(cfg));
+
+  const url = URL.createObjectURL(new Blob([JSON.stringify(cfg,null,2)],{type:"application/json"}));
+  const a=document.createElement("a"); a.href=url; a.download="sorteo.json"; a.click(); URL.revokeObjectURL(url);
+
+  $("huella").textContent = cfg.huella;
+  $("error").classList.add("hidden"); $("salida").classList.remove("hidden");
+});
+
+$("btnCopiar").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText($("huella").textContent); $("btnCopiar").textContent="Copiada"; }
+  catch(e){ const r=document.createRange(); r.selectNodeContents($("huella")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+  setTimeout(()=>{ $("btnCopiar").textContent="Copiar huella"; },1500);
+});
+})();
+</script>
+</body>
+</html>
